@@ -2,7 +2,9 @@ COMPILE = cc -Wall -Wextra -Werror# -g
 
 NAME = pipex
 
-SRC = srcs/main.c \
+SRC = srcs/pipex.c \
+	  srcs/parsing.c \
+	  srcs/freeing.c
 
 OBJ = $(SRC:.c=.o)
 
