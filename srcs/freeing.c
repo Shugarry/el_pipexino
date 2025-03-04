@@ -17,7 +17,7 @@ static void	split_free(char **arr)
 }
 
 // function that frees everything and exits the program
-void	seven_million(Commands *cmds, char *error)
+void	seven_million(t_pipex *cmds, char *error)
 {
 	if (cmds->infile)
 		free(cmds->infile);
@@ -28,4 +28,5 @@ void	seven_million(Commands *cmds, char *error)
 	split_free(cmds->cmd_b);
 	if (error)
 		perror(error);
+	exit(EXIT_SUCCESS);
 }
