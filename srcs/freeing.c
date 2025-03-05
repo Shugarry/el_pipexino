@@ -17,7 +17,7 @@ static void	split_free(char **arr)
 }
 
 // function that frees everything and exits the program
-void	seven_million(t_pipex *cmds, char *error)
+void	seven_million(t_pipex *cmds, char *error, int exit_status)
 {
 	if (cmds->infile)
 		free(cmds->infile);
@@ -28,5 +28,6 @@ void	seven_million(t_pipex *cmds, char *error)
 	split_free(cmds->cmd_b);
 	if (error)
 		perror(error);
-	exit(EXIT_SUCCESS);
+	exit(exit_status);
 }
+// TODO: close fds for pipe and others if necessary

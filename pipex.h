@@ -25,6 +25,7 @@
 # include <string.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <errno.h>
 
 typedef struct s_pipex
 {
@@ -36,12 +37,12 @@ typedef struct s_pipex
 	int		infile_fd;
 	int		outfile_fd;
 	int		pipe_fds[2];
-} t_pipex;
+}	t_pipex;
 
 //parsing.c
 bool	saul_good_str(t_pipex *cmds, char **av, char **env);
 
 //freeing.c
-void	seven_million(t_pipex *cmds, char *error);
+void	seven_million(t_pipex *cmds, char *error, int exit_status);
 
 #endif
