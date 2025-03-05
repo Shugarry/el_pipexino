@@ -6,11 +6,11 @@
 #    By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/04 18:56:05 by frey-gal          #+#    #+#              #
-#    Updated: 2025/03/04 18:56:14 by frey-gal         ###   ########.fr        #
+#    Updated: 2025/03/05 19:56:25 by frey-gal         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-COMPILE = cc -Wall -Wextra -Werror# -g
+COMPILE = cc -Wall -Wextra -Werror -g
 
 NAME = pipex
 

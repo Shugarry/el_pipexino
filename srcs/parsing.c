@@ -6,7 +6,7 @@
 /*   By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 18:56:07 by frey-gal          #+#    #+#             */
-/*   Updated: 2025/03/04 18:59:19 by frey-gal         ###   ########.fr       */
+/*   Updated: 2025/03/05 19:14:56 by frey-gal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ bool	saul_good_str(t_pipex *cmds, char **av, char **env)
 	int	i;
 
 	i = 0;
-	while (env[i++])
+	while (env[i++] != NULL)
 		if (ft_strncmp("PATH=", env[i], 5) == false)
 			break ;
 	cmds->path = ft_split((env[i] + 5), ':');

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   freeing.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: frey-gal <frey-gal@student.42barcelona.co  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/05 17:09:11 by frey-gal          #+#    #+#             */
+/*   Updated: 2025/03/05 20:48:11 by frey-gal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../pipex.h"
 
 // Frees each element of the char **str
@@ -16,6 +28,18 @@ static void	split_free(char **arr)
 	free(arr);
 }
 
+void	fd_cleaner(t_pipex *cmds)
+{
+	if (cmds->pipe_fds[0])
+		close(cmds->pipe_fds[0]);
+	if (cmds->pipe_fds[1])
+		close(cmds->pipe_fds[1]);
+	if (cmds->infile_fd)
+		close(cmds->infile_fd);
+	if (cmds->outfile_fd)
+		close(cmds->outfile_fd);
+}
+
 // function that frees everything and exits the program
 void	seven_million(t_pipex *cmds, char *error, int exit_status)
 {
@@ -30,4 +54,3 @@ void	seven_million(t_pipex *cmds, char *error, int exit_status)
 		perror(error);
 	exit(exit_status);
 }
-// TODO: close fds for pipe and others if necessary
