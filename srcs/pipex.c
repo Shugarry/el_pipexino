@@ -12,39 +12,51 @@
 
 #include "../pipex.h"
 
-// pipe_infile() forks the process, the child process changes 
+// Forks process, and returns pid on parent process for waitpid().
+// Child process then replaces STD IN/OUT for infile and respective pipe_fd
+// and does execve()
 int	pipe_infile(t_pipex *cmds, char **env)
 {
 	pid_t	pid;
 
 	pid = fork();
 	if (pid == -1)
-		seven_million(cmds, strerror(errno), EXIT_FAILURE);
+		seven_million(cmds, "fork failure", EXIT_FAILURE);
 	if (pid == 0)
 	{
-		dup2(cmds->infile_fd, STDIN_FILENO);
-		dup2(cmds->pipe_fds[WR_END], STDOUT_FILENO);
+		if (dup2(cmds->infile_fd, STDIN_FILENO) == -1
+			|| dup2(cmds->pipe_fds[WR_END], STDOUT_FILENO) == -1)
+		{
+			fd_cleaner(cmds);
+			seven_million(cmds, "dup2 failure", EXIT_FAILURE);
+		}
 		fd_cleaner(cmds);
 		if (execve(cmds->cmd_a[0], cmds->cmd_a, env) == -1)
-			seven_million(cmds, strerror(errno), EXIT_FAILURE);
+			seven_million(cmds, "execve failure", EXIT_FAILURE);
 	}
 	return (pid);
 }
 
+// Similar to pipe_infile() but swapping reads/writes ins/outs. Also returns
+// pid for waitpid()
 int	pipe_outfile(t_pipex *cmds, char **env)
 {
 	pid_t	pid;
 
 	pid = fork();
 	if (pid == -1)
-		seven_million(cmds, strerror(errno), EXIT_FAILURE);
+		seven_million(cmds, "fork failure", EXIT_FAILURE);
 	if (pid == 0)
 	{
-		dup2(cmds->pipe_fds[RD_END], STDIN_FILENO);
-		dup2(cmds->outfile_fd, STDOUT_FILENO);
+		if (dup2(cmds->pipe_fds[RD_END], STDIN_FILENO) == -1
+			|| dup2(cmds->outfile_fd, STDOUT_FILENO) == -1)
+		{
+			fd_cleaner(cmds);
+			seven_million(cmds, "dup2 failure", EXIT_FAILURE);
+		}
 		fd_cleaner(cmds);
 		if (execve(cmds->cmd_b[0], cmds->cmd_b, env) == -1)
-			seven_million(cmds, strerror(errno), EXIT_FAILURE);
+			seven_million(cmds, "execve failure", EXIT_FAILURE);
 	}
 	return (pid);
 }
@@ -61,17 +73,17 @@ int	main(int ac, char **av, char **env)
 		return (1);
 	saul_good_str(&cmds, av, env);
 	if (pipe(cmds.pipe_fds) == -1)
-		seven_million(&cmds, strerror(errno), EXIT_FAILURE);
+		seven_million(&cmds, "pipe failure", EXIT_FAILURE);
 	pid[0] = pipe_infile(&cmds, env);
 	pid[1] = pipe_outfile(&cmds, env);
 	fd_cleaner(&cmds);
 	if (waitpid(pid[0], &wait_status[0], 0) == -1)
-		seven_million(&cmds, strerror(errno), EXIT_FAILURE);
+		seven_million(&cmds, "waitpid failure", EXIT_FAILURE);
 	if (WIFEXITED(wait_status[0]) && WEXITSTATUS(wait_status[0]))
-		seven_million(&cmds, strerror(errno), WEXITSTATUS(wait_status[0]));
+		seven_million(&cmds, "subprocess failure", WEXITSTATUS(wait_status[0]));
 	if (waitpid(pid[1], &wait_status[0], 0) == -1)
-		seven_million(&cmds, strerror(errno), EXIT_FAILURE);
+		seven_million(&cmds, "waitpid failure", EXIT_FAILURE);
 	if (WIFEXITED(wait_status[1]) && WEXITSTATUS(wait_status[1]))
-		seven_million(&cmds, strerror(errno), WEXITSTATUS(wait_status[1]));
+		seven_million(&cmds, "subprocess failure", WEXITSTATUS(wait_status[1]));
 	seven_million(&cmds, NULL, EXIT_SUCCESS);
 }

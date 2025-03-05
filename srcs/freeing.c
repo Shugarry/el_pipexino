@@ -12,7 +12,7 @@
 
 #include "../pipex.h"
 
-// Frees each element of the char **str
+// Safely frees each element of the char* array (from ft_split)
 static void	split_free(char **arr)
 {
 	int	i;
@@ -28,6 +28,7 @@ static void	split_free(char **arr)
 	free(arr);
 }
 
+// Checks if fds are open and cleans them to prevent hanging fds
 void	fd_cleaner(t_pipex *cmds)
 {
 	if (cmds->pipe_fds[0])
@@ -40,7 +41,8 @@ void	fd_cleaner(t_pipex *cmds)
 		close(cmds->outfile_fd);
 }
 
-// function that frees everything and exits the program
+// Safely frees infile and outfile strings, prints error message if present and
+// exits program
 void	seven_million(t_pipex *cmds, char *error, int exit_status)
 {
 	if (cmds->infile)

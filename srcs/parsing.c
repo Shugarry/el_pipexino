@@ -12,24 +12,25 @@
 
 #include "../pipex.h"
 
-static void	check_cmd_a(t_pipex *cmds)
+// Parses and checks whether command a is an executable command by looking in
+// program root directory and through PATH. Replaces the command for full path
+// if found. Erroneous command is automatically handled later by execve()
+static void	check_cmd_a(t_pipex *cmds, int i)
 {
 	char	*command;
 	char	*tmp;
-	int		i;
 
-	i = 0;
 	if (access(cmds->cmd_a[0], X_OK) == 0)
 		return ;
 	while (cmds->path[i])
 	{
 		tmp = ft_strjoin(cmds->path[i], "/");
 		if (!tmp)
-			seven_million(cmds, strerror(errno), EXIT_FAILURE);
+			seven_million(cmds, "malloc failure", EXIT_FAILURE);
 		command = ft_strjoin(tmp, cmds->cmd_a[0]);
 		free(tmp);
 		if (!command)
-			seven_million(cmds, strerror(errno), EXIT_FAILURE);
+			seven_million(cmds, "malloc failure", EXIT_FAILURE);
 		if (access(command, X_OK) == 0)
 		{
 			free(cmds->cmd_a[0]);
@@ -40,27 +41,25 @@ static void	check_cmd_a(t_pipex *cmds)
 		free(command);
 		i++;
 	}
-	seven_million(cmds, "Infile does not exist", EXIT_FAILURE);
 }
 
-static void	check_cmd_b(t_pipex *cmds)
+// Same for command b
+static void	check_cmd_b(t_pipex *cmds, int i)
 {
 	char	*command;
 	char	*tmp;
-	int		i;
 
-	i = 0;
 	if (access(cmds->cmd_b[0], X_OK) == 0)
 		return ;
 	while (cmds->path[i])
 	{
 		tmp = ft_strjoin(cmds->path[i], "/");
 		if (!tmp)
-			seven_million(cmds, strerror(errno), EXIT_FAILURE);
+			seven_million(cmds, "malloc failure", EXIT_FAILURE);
 		command = ft_strjoin(tmp, cmds->cmd_b[0]);
 		free(tmp);
 		if (!command)
-			seven_million(cmds, strerror(errno), EXIT_FAILURE);
+			seven_million(cmds, "malloc failure", EXIT_FAILURE);
 		if (access(command, X_OK) == 0)
 		{
 			free(cmds->cmd_b[0]);
@@ -71,26 +70,25 @@ static void	check_cmd_b(t_pipex *cmds)
 		free(command);
 		i++;
 	}
-	seven_million(cmds, "Outfile does not exit", EXIT_FAILURE);
 }
 
+// Checks for validity of files, whether they exist or can be opened/read/write
+// On error, exits with error message
 static void	check_files(t_pipex *cmds)
 {
-
-	if (access(cmds->infile, R_OK) == 0)
-	{
-		cmds->infile_fd = open(cmds->infile, O_RDONLY);
-		if (cmds->infile_fd == -1)
-			seven_million(cmds, strerror(errno), EXIT_FAILURE);
-	}
+	cmds->infile_fd = open(cmds->infile, O_RDONLY);
+	if (cmds->infile_fd == -1 || access(cmds->infile, R_OK) == -1)
+		seven_million(cmds, "open failure", EXIT_FAILURE);
 	cmds->outfile_fd = open(cmds->outfile, O_CREAT | O_RDWR | O_TRUNC, 0755);
 	if (cmds->outfile_fd == -1 || access(cmds->outfile, W_OK) == -1)
 	{
 		close(cmds->infile_fd);
-		seven_million(cmds, strerror(errno), EXIT_FAILURE);
+		seven_million(cmds, "open failure", EXIT_FAILURE);
 	}
 }
 
+// Initializes and parses every command/file path necessary in the t_pipex
+// struct
 bool	saul_good_str(t_pipex *cmds, char **av, char **env)
 {
 	int	i;
@@ -106,9 +104,9 @@ bool	saul_good_str(t_pipex *cmds, char **av, char **env)
 	cmds->cmd_b = ft_split(av[3], ' ');
 	if (!cmds->path || !cmds->infile || !cmds->outfile
 		|| !cmds->cmd_a || !cmds->cmd_b)
-		seven_million(cmds, strerror(errno), EXIT_FAILURE);
-	check_cmd_a(cmds);
-	check_cmd_b(cmds);
+		seven_million(cmds, "malloc failure", EXIT_FAILURE);
+	check_cmd_a(cmds, 0);
+	check_cmd_b(cmds, 0);
 	check_files(cmds);
 	return (true);
 }

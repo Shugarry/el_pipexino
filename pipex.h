@@ -27,8 +27,8 @@
 # include <sys/wait.h>
 # include <errno.h>
 
-#define	RD_END 0
-#define	WR_END 1
+# define RD_END 0
+# define WR_END 1
 
 typedef struct s_pipex
 {
