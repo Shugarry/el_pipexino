@@ -20,8 +20,6 @@ static void	check_cmd_a(t_pipex *cmds, int i)
 	char	*command;
 	char	*tmp;
 
-	if (access(cmds->cmd_a[0], X_OK) == 0)
-		return ;
 	while (cmds->path[i])
 	{
 		tmp = ft_strjoin(cmds->path[i], "/");
@@ -41,6 +39,8 @@ static void	check_cmd_a(t_pipex *cmds, int i)
 		free(command);
 		i++;
 	}
+	if (access(cmds->cmd_a[0], X_OK) == 0)
+		return ;
 }
 
 // Same for command b
@@ -49,8 +49,6 @@ static void	check_cmd_b(t_pipex *cmds, int i)
 	char	*command;
 	char	*tmp;
 
-	if (access(cmds->cmd_b[0], X_OK) == 0)
-		return ;
 	while (cmds->path[i])
 	{
 		tmp = ft_strjoin(cmds->path[i], "/");
@@ -70,6 +68,8 @@ static void	check_cmd_b(t_pipex *cmds, int i)
 		free(command);
 		i++;
 	}
+	if (access(cmds->cmd_b[0], X_OK) == 0)
+		return ;
 }
 
 // Checks for validity of files, whether they exist or can be opened/read/write
