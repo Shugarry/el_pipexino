@@ -43,10 +43,11 @@ typedef struct s_pipex
 }	t_pipex;
 
 //parsing.c
-bool	saul_good_str(t_pipex *cmds, char **av, char **env);
+void	parser(t_pipex *cmds, char **av, char **env);
 
 //freeing.c
-void	fd_cleaner(t_pipex *cmds);
-void	seven_million(t_pipex *cmds, char *error, int exit_status);
+void	pipe_cleaner(t_pipex *cmds);
+void	in_out_cleaner(t_pipex *cmds);
+void	free_exit(t_pipex *cmds, char *error, int exit_status);
 
 #endif

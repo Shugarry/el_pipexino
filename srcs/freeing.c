@@ -29,21 +29,25 @@ static void	split_free(char **arr)
 }
 
 // Checks if fds are open and cleans them to prevent hanging fds
-void	fd_cleaner(t_pipex *cmds)
+void	pipe_cleaner(t_pipex *cmds)
 {
 	if (cmds->pipe_fds[0])
 		close(cmds->pipe_fds[0]);
 	if (cmds->pipe_fds[1])
 		close(cmds->pipe_fds[1]);
-	if (cmds->infile_fd)
+}
+
+void	in_out_cleaner(t_pipex *cmds)
+{
+	if (cmds->infile_fd && cmds->infile_fd != -1)
 		close(cmds->infile_fd);
-	if (cmds->outfile_fd)
+	if (cmds->outfile_fd && cmds->outfile_fd != -1)
 		close(cmds->outfile_fd);
 }
 
 // Safely frees infile and outfile strings, prints error message if present and
 // exits program
-void	seven_million(t_pipex *cmds, char *error, int exit_status)
+void	free_exit(t_pipex *cmds, char *error, int exit_status)
 {
 	if (cmds->infile)
 		free(cmds->infile);
@@ -52,6 +56,8 @@ void	seven_million(t_pipex *cmds, char *error, int exit_status)
 	split_free(cmds->path);
 	split_free(cmds->cmd_a);
 	split_free(cmds->cmd_b);
+	pipe_cleaner(cmds);
+	in_out_cleaner(cmds);
 	if (error)
 		perror(error);
 	exit(exit_status);
