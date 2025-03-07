@@ -31,12 +31,13 @@ static void	split_free(char **arr)
 // Checks if fds are open and cleans them to prevent hanging fds
 void	pipe_cleaner(t_pipex *cmds)
 {
-	if (cmds->pipe_fds[0])
+	if (cmds->pipe_fds[0] && cmds->pipe_fds[0] != -1)
 		close(cmds->pipe_fds[0]);
-	if (cmds->pipe_fds[1])
+	if (cmds->pipe_fds[1] && cmds->pipe_fds[1] != -1)
 		close(cmds->pipe_fds[1]);
 }
 
+// Same as pipe cleaner but for in/out files
 void	in_out_cleaner(t_pipex *cmds)
 {
 	if (cmds->infile_fd && cmds->infile_fd != -1)
