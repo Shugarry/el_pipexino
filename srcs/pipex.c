@@ -32,11 +32,11 @@ int	pipe_infile(t_pipex *cmds, char **env)
 		if (cmds->cmd_a[0] && cmds->cmd_a[0][0])
 			execve(cmds->cmd_a[0], cmds->cmd_a, env);
 		else
-			free_exit(cmds, "execve failure", 126);
+			free_exit(cmds, NULL, 126);
 		if (errno == ENOENT)
-			free_exit(cmds, "execve failure", 127);
+			free_exit(cmds, NULL, 127);
 		else
-			free_exit(cmds, "execve failure", EXIT_FAILURE);
+			free_exit(cmds, NULL, EXIT_FAILURE);
 	}
 	return (pid);
 }
@@ -60,11 +60,11 @@ int	pipe_outfile(t_pipex *cmds, char **env)
 		if (cmds->cmd_b[0] && cmds->cmd_b[0][0])
 			execve(cmds->cmd_b[0], cmds->cmd_b, env);
 		else
-			free_exit(cmds, "execve failure", 126);
+			free_exit(cmds, NULL, 126);
 		if (errno == ENOENT)
-			free_exit(cmds, "execve failure", 127);
+			free_exit(cmds, NULL, 127);
 		else
-			free_exit(cmds, "execve failure", EXIT_FAILURE);
+			free_exit(cmds, NULL, EXIT_FAILURE);
 	}
 	return (pid);
 }
@@ -78,21 +78,21 @@ int	main(int ac, char **av, char **env)
 	wait_status[0] = 0;
 	wait_status[1] = 0;
 	if (ac != 5)
-		return (1);
+		free_exit(&cmds, "format: ./pipex inf cmd1 cmd2 outf", EXIT_FAILURE);
 	if (pipe(cmds.pipe_fds) == -1)
-		free_exit(&cmds, "pipe failure", EXIT_FAILURE);
+		free_exit(&cmds, "pipe() failure", EXIT_FAILURE);
 	parser(&cmds, av, env);
 	pid[0] = pipe_infile(&cmds, env);
 	pid[1] = pipe_outfile(&cmds, env);
 	if (waitpid(pid[0], &wait_status[0], 0) == -1)
-		free_exit(&cmds, "waitpid failure", EXIT_FAILURE);
+		free_exit(&cmds, "waitpid() failure", EXIT_FAILURE);
 	close(cmds.pipe_fds[WR_END]);
 	if (waitpid(pid[1], &wait_status[1], 0) == -1)
-		free_exit(&cmds, "waitpid failure", EXIT_FAILURE);
+		free_exit(&cmds, "waitpid() failure", EXIT_FAILURE);
 	close(cmds.pipe_fds[RD_END]);
 	if (WIFEXITED(wait_status[0]) && WEXITSTATUS(wait_status[0]))
-		free_exit(&cmds, "subprocess failure", WEXITSTATUS(wait_status[0]));
+		free_exit(&cmds, "execve() failure", WEXITSTATUS(wait_status[0]));
 	if (WIFEXITED(wait_status[1]) && WEXITSTATUS(wait_status[1]))
-		free_exit(&cmds, "subprocess failure", WEXITSTATUS(wait_status[1]));
+		free_exit(&cmds, "execve() failure", WEXITSTATUS(wait_status[1]));
 	free_exit(&cmds, NULL, EXIT_SUCCESS);
 }

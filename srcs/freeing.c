@@ -50,6 +50,10 @@ void	in_out_cleaner(t_pipex *cmds)
 // exits program
 void	free_exit(t_pipex *cmds, char *error, int exit_status)
 {
+	if (error && strcmp(error, "format: ./pipex inf cmd1 cmd2 outf") != 0)
+		perror(error);
+	else if (error && strcmp(error, "format: ./pipex inf cmd1 cmd2 outf") == 0)
+		printf("%s\n", error);
 	if (cmds->infile)
 		free(cmds->infile);
 	if (cmds->outfile)
@@ -59,7 +63,5 @@ void	free_exit(t_pipex *cmds, char *error, int exit_status)
 	split_free(cmds->cmd_b);
 	pipe_cleaner(cmds);
 	in_out_cleaner(cmds);
-	if (error)
-		perror(error);
 	exit(exit_status);
 }

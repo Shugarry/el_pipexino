@@ -20,15 +20,17 @@ static void	check_cmd_a(t_pipex *cmds, int i)
 	char	*command;
 	char	*tmp;
 
+	if (cmds->path == NULL)
+		return ;
 	while (cmds->path[i])
 	{
 		tmp = ft_strjoin(cmds->path[i], "/");
 		if (!tmp)
-			free_exit(cmds, "malloc failure", EXIT_FAILURE);
+			free_exit(cmds, "malloc() failure", EXIT_FAILURE);
 		command = ft_strjoin(tmp, cmds->cmd_a[0]);
 		free(tmp);
 		if (!command)
-			free_exit(cmds, "malloc failure", EXIT_FAILURE);
+			free_exit(cmds, "malloc() failure", EXIT_FAILURE);
 		if (access(command, X_OK) == 0)
 		{
 			free(cmds->cmd_a[0]);
@@ -39,8 +41,6 @@ static void	check_cmd_a(t_pipex *cmds, int i)
 		free(command);
 		i++;
 	}
-	if (access(cmds->cmd_a[0], X_OK) == 0)
-		return ;
 }
 
 // Same for command b
@@ -49,15 +49,17 @@ static void	check_cmd_b(t_pipex *cmds, int i)
 	char	*command;
 	char	*tmp;
 
+	if (cmds->path == NULL)
+		return ;
 	while (cmds->path[i])
 	{
 		tmp = ft_strjoin(cmds->path[i], "/");
 		if (!tmp)
-			free_exit(cmds, "malloc failure", EXIT_FAILURE);
+			free_exit(cmds, "malloc() failure", EXIT_FAILURE);
 		command = ft_strjoin(tmp, cmds->cmd_b[0]);
 		free(tmp);
 		if (!command)
-			free_exit(cmds, "malloc failure", EXIT_FAILURE);
+			free_exit(cmds, "malloc() failure", EXIT_FAILURE);
 		if (access(command, X_OK) == 0)
 		{
 			free(cmds->cmd_b[0]);
@@ -68,8 +70,6 @@ static void	check_cmd_b(t_pipex *cmds, int i)
 		free(command);
 		i++;
 	}
-	if (access(cmds->cmd_b[0], X_OK) == 0)
-		return ;
 }
 
 // Checks for validity of files, whether they exist or can be opened/read/write
@@ -102,11 +102,15 @@ void	parser(t_pipex *cmds, char **av, char **env)
 	int	i;
 
 	i = 0;
-	while (env[i++] != NULL)
+	while (env[i] != NULL)
+	{
 		if (ft_strncmp("PATH=", env[i], 5) == false)
 			break ;
+		i++;
+	}
 	init_struct(cmds);
-	cmds->path = ft_split((env[i] + 5), ':');
+	if (env[i])
+		cmds->path = ft_split((env[i] + 5), ':');
 	cmds->infile = ft_strdup(av[1]);
 	cmds->outfile = ft_strdup(av[4]);
 	cmds->cmd_a = ft_split(av[2], ' ');
